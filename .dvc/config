@@ -1,0 +1,4 @@
+[core]
+    remote = dvcstorage
+['remote "dvcstorage"']
+    url = s3://email-spam-detection-dvc-s3

@@ -6,6 +6,7 @@ import pickle
 import json
 from sklearn.metrics import accuracy_score , precision_score , recall_score, roc_auc_score
 import yaml
+from dvclive import Live
 
 log_dir = 'logs'
 os.makedirs(log_dir,exist_ok=True)
@@ -26,6 +27,23 @@ console_handler.setFormatter(formats)
 
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
+
+def load_params(param_path:str):
+      try:
+            with open(param_path , 'r') as file:
+                  params = yaml.safe_load(file)
+            logger.debug('parameters retrived from %s ',param_path)
+            logger.debug('type of param %s',type(params['data_ingestion']['test_size']))
+            return params
+      except FileNotFoundError:
+            logger.error('File not found at %s',param_path)
+            raise
+      except yaml.YAMLError as e:
+            logger.error('YAML error %s ',e)
+            raise
+      except Exception as e:
+            logger.error('unexpected error while loading param %s ',param_path)
+            raise 
 
 def load_model(file_path:str):
       """
@@ -92,13 +110,28 @@ def save_metrics(metrics:dict , file_path:str )-> None:
 
 def main():
       try:
+            params = load_params(param_path='params.yaml')
             clf  = load_model('./models/model.pkl')
             test_data = load_data('./data/processed/test_tfidf.csv')
+            train_data = load_data('./data/processed/train_tfidf.csv')
             
+            x_train = train_data.iloc[:,:-1].values
+            y_train = train_data.iloc[:,-1].values
             x_test = test_data.iloc[:,:-1].values
             y_test = test_data.iloc[:,-1].values
             
+            train_metrics = evaluate_model(clf , x_train , y_train)
             metrics = evaluate_model(clf,x_test , y_test)
+            
+            with Live(save_dvc_exp=True) as dvclive:
+                  dvclive.log_metric("train_accuracy", train_metrics["accuracy"])
+                  dvclive.log_metric("train_precision", train_metrics["precision"])
+                  dvclive.log_metric("train_recall", train_metrics["recall"])
+                  dvclive.log_metric("accuracy", metrics["accuracy"])
+                  dvclive.log_metric("precision", metrics["precision"])
+                  dvclive.log_metric("recall", metrics["recall"])
+                  
+                  dvclive.log_params(params)              
             
             save_metrics(metrics,'reports/metrics.json')
             

@@ -1,0 +1,8 @@
+pandas
+numpy
+nltk
+tabulate
+dvc
+dvclive
+scikit-learn
+dvc[s3]

@@ -11,7 +11,7 @@ stages:
     cmd: python src/data_preprocessing.py
     deps:
     - src/data_preprocessing.py
-    - data/raw    
+    - data/raw
     outs:
     - data/interim
   feature_engineering:
@@ -20,7 +20,7 @@ stages:
     - src/feature_engineering.py
     - data/interim
     params:
-    - feature_engineering.max_features    
+    - feature_engineering.max_features
     outs:
     - data/processed
   model_training:
@@ -42,4 +42,10 @@ stages:
     - reports/metrics.json
 
 
-  
+params:
+- dvclive/params.yaml
+metrics:
+- dvclive/metrics.json
+plots:
+- dvclive/plots/metrics:
+    x: step
