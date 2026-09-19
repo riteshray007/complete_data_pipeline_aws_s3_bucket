@@ -9,6 +9,9 @@ models/
 reports/
 .vscode/
 
+# files
+projectWorkFlow.txt
+
 # C extensions
 *.so
 
