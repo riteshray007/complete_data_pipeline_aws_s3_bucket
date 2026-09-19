@@ -111,6 +111,29 @@ dvc exp apply <experiment-name>
 dvc exp apply rocky-inks
 ```
 
+### 4. Run Custom Experiments with Modified Parameters
+
+Collaborators and new users can easily test custom hyperparameters without cluttering the Git commit history:
+
+1. Open `params.yaml` and modify any desired hyperparameter values (e.g., feature sizes, test split sizes, or model parameters).
+2. Execute a new isolated experiment:
+
+```
+# Run experiment with an auto-generated experiment name
+dvc exp run
+
+# Or run with a custom experiment name and direct parameter overrides
+dvc exp run -n custom-feature-test -S feature_engineering.max_features=3000
+
+```
+
+3. Compare the newly generated metrics against existing experiments:
+
+```
+dvc exp show
+
+```
+
 ### 4. Promote Winning Experiment to `main`
 Once an applied experiment is validated, commit and push it to the main repository branch:
 ```bash
